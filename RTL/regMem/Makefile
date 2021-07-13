@@ -9,6 +9,8 @@ TEST_PATH 	    := ./testbench
 LIB_PATH 	    := ../../lib/module_lib
 TOOL_PATH		:= ../../lib/tb_tool
 
+LIB_NAME += flipflop
+
 # Compiler
 VCC  := vcom
 VLIB := vlib
@@ -50,7 +52,7 @@ all: 	compile
 #	vsim -c -do "run -All" $(TOP)
 
 sim:
-	$(VSIM) $(SFLAG) $(TOP) $(SIMMODULE) 
+	$(VSIM) $(SFLAG) $(TOP) $(SIMMODULE) -L  $(INC_LIB)
 	
 
 clean:
@@ -59,10 +61,10 @@ clean:
 	rm -rf $(LIB_PATH)/$(MODULE_NAME)_lib ./$(MODULE_NAME)_lib 
 
 
-compile:
+compile :
 	$(VMAP) flipflop $(INC_LIB) 
 	$(VCC) $(VFLAG) $(MODULE) $(TOOL) -work $(LIB_PATH)/$(MODULE_NAME)_lib
 	$(VMAP) $(MODULE_NAME) $(LIB_PATH)/$(MODULE_NAME)_lib
 	$(VCC) $(VFLAG) $(TEST) $(TOOL)
-
+ 
  
