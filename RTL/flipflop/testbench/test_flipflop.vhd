@@ -1,12 +1,13 @@
 library ieee;
+library flipflop;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 use ieee.numeric_std.all;
 use std.textio.all;
 
-use work.ff.all;
-use work.tb_pkg.all;
+use flipflop.ff.all;
+use flipflop.tb_pkg.all;
 
 entity DFF_tb is
     generic (n : integer := 4);

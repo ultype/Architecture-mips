@@ -60,9 +60,8 @@ clean:
 
 
 compile:
-	$(VCC) $(VFLAG) $(MODULE) $(TOOL) -work work
-	$(VLIB) $(LIB_PATH)/$(MODULE_NAME)_lib
-	$(VMAP) $(LIB_PATH)/$(MODULE_NAME)_lib work
-	$(VCC) $(VFLAG) $(TEST) $(TOOL) -nocreatelib
+	$(VCC) $(VFLAG) $(MODULE) $(TOOL) -work $(LIB_PATH)/$(MODULE_NAME)_lib
+	$(VMAP) $(MODULE_NAME) $(LIB_PATH)/$(MODULE_NAME)_lib
+	$(VCC) $(VFLAG) $(TEST) $(TOOL)
 
  
