@@ -36,8 +36,47 @@ package ALU_pkg is
       s, Cout       : out std_logic);
   end component;
 
+  component ALUUnit is
+    port (
+      inA, inB, Cin, less : in std_logic;
+      invA, invB          : in std_logic;
+      sel                 : in std_logic_vector(1 downto 0);
+      result, Cout        : out std_logic);
+  end component;
 end package;
 
+library ieee;
+library work;
+use ieee.std_logic_1164.all;
+use work.ALU_pkg.all;
+
+entity ALUUnit is
+  port (
+    inA, inB, Cin, less : in std_logic;
+    invA, invB          : in std_logic;
+    sel                 : in std_logic_vector(1 downto 0);
+    result, Cout        : out std_logic);
+end ALUUnit;
+
+architecture ALUUnit_impl of ALUUnit is
+  signal A0, B0, s0, andAB, orAB : std_logic;
+begin
+  A0    <= invA xor inA;
+  B0    <= invB xor inB;
+
+  andAB <= A0 and B0;
+  orAB  <= A0 and B0;
+
+  FA0 : FA port map(inA => A0, inB => B0, Cin => Cin, s => s0, Cout);
+
+  with sel select
+    result <=
+    andAB when 2b"00",
+    orAB when 2b"01",
+    s0 when 2b"10",
+    less when others;
+
+end ALUUnit_impl;
 library ieee;
 library work;
 use ieee.std_logic_1164.all;
