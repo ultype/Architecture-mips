@@ -50,23 +50,28 @@ library work;
 use ieee.std_logic_1164.all;
 use work.ALU_pkg.all;
 
-entity ALU is
+entity ALUUnit is
   port (
     inA, inB, Cin, less : in std_logic;
     invA, invB          : in std_logic;
     sel                 : in std_logic_vector(1 downto 0);
     result, Cout        : out std_logic);
-end ALU;
+end ALUUnit;
 
 architecture ALUUnit_impl of ALUUnit is
-  signal A0, B0, s0, andAB, orAB, xorAB : std_logic;
+  signal A0, B0, s0, c0, andAB, orAB, xorAB : std_logic;
 begin
+  HA1 : HA port map(a => xorAB, b => Cin, s => s0, c => c0);
+
+  -- inverse
   A0    <= invA xor inA;
   B0    <= invB xor inB;
 
+  --  
   andAB <= A0 and B0; --HA0 cout
   xorAB <= A0 xor B0; --HA0 s
   orAB  <= A0 or B0;
+  Cout  <= c0 xor andAB;
 
   with sel select
     result <=
