@@ -24,19 +24,57 @@ package ALU_pkg is
     );
   end component;
 
-  component FA is
+  component HA is
+    port (
+      a, b : in std_logic;
+      s, c : out std_logic);
+  end component;
 
+  component FA is
+    port (
+      inA, inB, Cin : in std_logic;
+      s, Cout       : out std_logic);
   end component;
 
 end package;
 
 library ieee;
+library work;
+use ieee.std_logic_1164.all;
+use work.ALU_pkg.all;
+entity FA is
+  port (
+    inA, inB, Cin : in std_logic;
+    s, Cout       : out std_logic);
+end FA;
+
+architecture FA_impl of FA is
+  signal c0, c1, s0 : std_logic;
+  component HA is
+    port (
+      a, b : in std_logic;
+      s, c : out std_logic);
+  end component;
+begin
+  HA0 : HA port map(a => inA, b => inB, c => c0, s => s0);
+  HA1 : HA port map(a => s0, b => Cin, c => c1, s => s);
+  Cout <= c1 xor c0;
+end FA_impl;
+
+library ieee;
 use ieee.std_logic_1164.all;
 
 entity HA is
-  A, B : in std_logic;
-  S, C : out std_logic;
+  port (
+    a, b : in std_logic;
+    s, c : out std_logic);
 end HA;
+
+architecture HA_impl of HA is
+begin
+  s <= a xor b;
+  c <= a and b;
+end HA_impl;
 
 library ieee;
 use ieee.std_logic_1164.all;
