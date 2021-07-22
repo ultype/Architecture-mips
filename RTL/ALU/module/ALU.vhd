@@ -50,15 +50,65 @@ library work;
 use ieee.std_logic_1164.all;
 use work.ALU_pkg.all;
 
-entity ALUUnit is
+entity ALU32 is
   port (
-    inA, inB, Cin, less : in std_logic;
-    invA, invB          : in std_logic;
-    sel                 : in std_logic_vector(1 downto 0);
-    result, Cout        : out std_logic);
-end ALUUnit;
+    A, B       : in std_logic_vector(31 downto 0);
+    invA, invB : in std_logic;
+    op         : in std_logic_vector(2 downto 0);
+    result     : in std_logic_vector(2 downto 0);
+  );
+end ALU32;
 
-architecture ALUUnit_impl of ALUUnit is
+architecture ALU32_impl of ALU32 is
+  signal sub_carry : std_logic;
+  signal c         : std_logic_vector(31 downto 0);
+begin
+
+  GEN_ADD : for I in 0 to 7 generate
+
+    LOWER_BIT : if I = 0 generate
+      U0 : ALUunit port map(
+        inA    => A(I),
+        inB    => B(I),
+        Cin    => sub,
+        invA   =>
+        invB   =>
+        sel    =>
+        result =>
+        Cout   => c(I)
+      );
+    end generate LOWER_BIT;
+
+    UPPER_BITS : if I > 0 generate
+      U0 : ALUunit port map(
+        inA    => A(I),
+        inB    => B(I),
+        Cin    => c(I - 1),
+        invA   =>
+        invB   =>
+        sel    =>
+        result =>
+        Cout   => c(I)
+      );
+    end generate UPPER_BITS;
+
+  end generate GEN_ADD;
+end ALU32_impl;
+
+library ieee;
+library work;
+use ieee.std_logic_1164.all;
+use work.ALU_pkg.all;
+
+entity ALUunit is
+  port (
+    inA, inB, Cin : in std_logic;
+    invA, invB    : in std_logic;
+    sel           : in std_logic_vector(1 downto 0);
+    result, Cout  : out std_logic);
+end ALUunit;
+
+architecture ALUunit_impl of ALUunit is
   signal A0, B0, s0, c0, andAB, orAB, xorAB : std_logic;
 begin
   HA1 : HA port map(a => xorAB, b => Cin, s => s0, c => c0);
@@ -67,7 +117,7 @@ begin
   A0    <= invA xor inA;
   B0    <= invB xor inB;
 
-  --  
+  -- logic and HA operation  
   andAB <= A0 and B0; --HA0 cout
   xorAB <= A0 xor B0; --HA0 s
   orAB  <= A0 or B0;
@@ -75,12 +125,13 @@ begin
 
   with sel select
     result <=
-    andAB when 2b"00",
-    orAB when 2b"01",
-    s0 when 2b"10",
-    less when others;
+    andAB when 2b"00", -- and nor
+    orAB when 2b"01",  -- or
+    xorAB when 2b"10", --xor
+    s0 when 2b"11";    -- add sub
 
-end ALUUnit_impl;
+end ALUunit_impl;
+
 library ieee;
 library work;
 use ieee.std_logic_1164.all;

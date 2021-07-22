@@ -29,6 +29,10 @@ package MipsEncode_pkg is
         j_addr : J_ADDR_TYPE;
     end record J_TYPE;
 
+    -- load word I-type
+    constant LW_OP     : OPCODE_TYPE := 6b"100011";
+    constant SW_OP     : OPCODE_TYPE := 6b"101011";
+
     -- ADD R-TYPE
     constant ADD_OP    : OPCODE_TYPE := 6b"000000";
     constant ADD_FUNC  : FUNC_TYPE   := 6b"100000";
