@@ -4,6 +4,7 @@ DUMP = $(PROJECT).s
 TOOL = mips-linux-gnu-
 CC = $(TOOL)gcc
 DP = $(TOOL)objdump
+#objdump
 RM = rm
 src = $(wildcard *.c *.h)
 
@@ -21,8 +22,8 @@ OBJS := \
 all : $(DUMP)
 
 $(DUMP) : $(EXEC) $(OBJS)
-	$(DP) -Slz  $(EXEC) > testbin0.txt
-	$(DP) -Slz  $(OBJS) > testobj0.txt
+	$(DP)  -Slz  $(EXEC) > testbin0.txt
+	$(DP)  -Slz  $(OBJS) > testobj0.txt
 
 $(EXEC): $(OBJS)
 	$(CC) -o $@ $^ $(LDFLAGS)

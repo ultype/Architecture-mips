@@ -36,6 +36,13 @@ package ALU_pkg is
       s, Cout       : out std_logic);
   end component;
 
+  component Adder32 is
+    port (
+      inA, inB : in std_logic_vector(31 downto 0);
+      result   : out std_logic_vector(31 downto 0)
+    );
+  end component;
+
   component ALUUnit is
     port (
       inA, inB, Cin, less : in std_logic;
@@ -44,56 +51,54 @@ package ALU_pkg is
       result, Cout        : out std_logic);
   end component;
 end package;
+--library ieee;
+--library work;
+--use ieee.std_logic_1164.all;
+--use work.ALU_pkg.all;
 
-library ieee;
-library work;
-use ieee.std_logic_1164.all;
-use work.ALU_pkg.all;
+--entity ALU32 is
+--  port (
+--    A, B       : in std_logic_vector(31 downto 0);
+--    invA, invB : in std_logic;
+--    opcode     : in std_logic_vector(5 downto 0);
+--
+--    result     : in std_logic_vector(2 downto 0);
+--  );
+--end ALU32;
 
-entity ALU32 is
-  port (
-    A, B       : in std_logic_vector(31 downto 0);
-    invA, invB : in std_logic;
-    op         : in std_logic_vector(2 downto 0);
-    result     : in std_logic_vector(2 downto 0);
-  );
-end ALU32;
+--architecture ALU32_impl of ALU32 is
+--  signal Bsrc : std_logic_vector(31 downto 0)
+--  signal ctrl : std_logic_vector(5 downto 0);
+--  signal C    : std_logic_vector(32 downto 0);
+--  signal S    : std_logic_vector(31 downto 0);
+--begin
 
-architecture ALU32_impl of ALU32 is
-  signal sub_carry : std_logic;
-  signal c         : std_logic_vector(31 downto 0);
-begin
+--  GEN_ADD : for I in 0 to 31 generate
+--    U0 : ALUunit port map(
+--      inA    => A(I),
+--      inB    => Bsrc(I),
+--      Cin    => C(I),
+--      invA   => ctrl(3),
+--      invB   => ctrl(2),
+--      sel    => ctrl(1 downto 0)
+--      result => S(I),
+--      Cout   => C(I + 1)
+--    );
 
-  GEN_ADD : for I in 0 to 7 generate
+--    ALU_CTRL : process (all)
+--    begin
 
-    LOWER_BIT : if I = 0 generate
-      U0 : ALUunit port map(
-        inA    => A(I),
-        inB    => B(I),
-        Cin    => sub,
-        invA   =>
-        invB   =>
-        sel    =>
-        result =>
-        Cout   => c(I)
-      );
-    end generate LOWER_BIT;
+--    end process;
 
-    UPPER_BITS : if I > 0 generate
-      U0 : ALUunit port map(
-        inA    => A(I),
-        inB    => B(I),
-        Cin    => c(I - 1),
-        invA   =>
-        invB   =>
-        sel    =>
-        result =>
-        Cout   => c(I)
-      );
-    end generate UPPER_BITS;
+--    ALU_RESULT : process (all)
+--    beginingl
+--      with ctrl(4) select
+--      result <= S when '0',
+--        result <= 31b"0" & C(32);
+--    end process;
 
-  end generate GEN_ADD;
-end ALU32_impl;
+--  end generate GEN_ADD;
+--end ALU32_impl;
 
 library ieee;
 library work;
@@ -127,10 +132,46 @@ begin
     result <=
     andAB when 2b"00", -- and nor
     orAB when 2b"01",  -- or
-    xorAB when 2b"10", --xor
-    s0 when 2b"11";    -- add sub
+    xorAB when 2b"10", -- xor
+    s0 when others;    -- add sub 2b'11'
 
 end ALUunit_impl;
+
+library ieee;
+library work;
+use ieee.std_logic_1164.all;
+use work.ALU_pkg.all;
+
+entity Adder32 is
+  port (
+    inA, inB : in std_logic_vector(31 downto 0);
+    result   : out std_logic_vector(31 downto 0)
+  );
+end Adder32;
+
+architecture Adder32_impl of Adder32 is
+
+  component FA is
+    port (
+      inA, inB, Cin : in std_logic;
+      s, Cout       : out std_logic);
+  end component;
+
+  signal C : std_logic_vector(32 downto 0);
+
+begin
+  C(0) <= '0';
+  GEN_ADD : for I in 0 to 31 generate
+    U0 : FA port map(
+      inA  => inA(I),
+      inB  => inB(I),
+      Cin  => C(I),
+      s    => result(I),
+      Cout => C(I + 1)
+    );
+  end generate GEN_ADD;
+
+end Adder32_impl;
 
 library ieee;
 library work;

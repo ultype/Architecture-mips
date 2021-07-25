@@ -6,7 +6,7 @@ use ieee.std_logic_textio.all;
 
 package simMem_pkg is
   constant ram_width  : integer := 8;
-  constant ram_depth  : integer := 1024;
+  constant ram_depth  : integer := 4 * 1024 * 1024;
   constant addr_width : integer := 32;
   constant data_width : integer := 32;
   type ram_type is array (0 to ram_depth - 1) of std_logic_vector(ram_width - 1 downto 0);
@@ -56,14 +56,14 @@ architecture dualMem_rtl of dualMem is
   signal waddr2 : std_logic_vector(addr_width - 1 downto 0);
   signal waddr3 : std_logic_vector(addr_width - 1 downto 0);
 begin
-  raddr0 <= raddr(data_width - 1 downto 2) & 2b"00";
-  raddr1 <= raddr(data_width - 1 downto 2) & 2b"01";
-  raddr2 <= raddr(data_width - 1 downto 2) & 2b"10";
-  raddr3 <= raddr(data_width - 1 downto 2) & 2b"11";
-  waddr0 <= waddr(data_width - 1 downto 2) & 2b"00";
-  waddr1 <= waddr(data_width - 1 downto 2) & 2b"01";
-  waddr2 <= waddr(data_width - 1 downto 2) & 2b"10";
-  waddr3 <= waddr(data_width - 1 downto 2) & 2b"11";
+  raddr0 <= raddr(addr_width - 1 downto 2) & 2b"00";
+  raddr1 <= raddr(addr_width - 1 downto 2) & 2b"01";
+  raddr2 <= raddr(addr_width - 1 downto 2) & 2b"10";
+  raddr3 <= raddr(addr_width - 1 downto 2) & 2b"11";
+  waddr0 <= waddr(addr_width - 1 downto 2) & 2b"00";
+  waddr1 <= waddr(addr_width - 1 downto 2) & 2b"01";
+  waddr2 <= waddr(addr_width - 1 downto 2) & 2b"10";
+  waddr3 <= waddr(addr_width - 1 downto 2) & 2b"11";
   writer : process (all)
   begin
     if rising_edge(clk1) then
@@ -112,34 +112,38 @@ architecture instrMem_rtl of instrMem is
   signal raddr2   : std_logic_vector(addr_width - 1 downto 0);
   signal raddr3   : std_logic_vector(addr_width - 1 downto 0);
 begin
-  file_open(read_file, "instr.dat", read_mode);
-  raddr0 <= raddr(data_width - 1 downto 2) & 2b"00";
-  raddr1 <= raddr(data_width - 1 downto 2) & 2b"01";
-  raddr2 <= raddr(data_width - 1 downto 2) & 2b"10";
-  raddr3 <= raddr(data_width - 1 downto 2) & 2b"11";
+  file_open(read_file, "./instr.dat", read_mode);
+  raddr0 <= raddr(addr_width - 1 downto 2) & 2b"00";
+  raddr1 <= raddr(addr_width - 1 downto 2) & 2b"01";
+  raddr2 <= raddr(addr_width - 1 downto 2) & 2b"10";
+  raddr3 <= raddr(addr_width - 1 downto 2) & 2b"11";
   loadInstr : process (rst)
     variable line_v : line;
-    variable word   : std_ulogic_vector(data_width - 1 downto 0);
+    variable word   : std_ulogic_vector(addr_width + data_width - 1 downto 0);
+    variable addr   : std_logic_vector(addr_width - 1 downto 0);
+    variable instr  : std_logic_vector(data_width - 1 downto 0);
     variable good   : boolean;
     variable i      : integer := 0;
   begin
     if (rst'event and rst = '1') then
       while (not endfile(read_file)) loop
         readline(read_file, line_v);
-        READ(line_v, word, good);
-        RAM(i)     <= word(7 downto 0);
-        RAM(i + 1) <= word(15 downto 8);
-        RAM(i + 2) <= word(23 downto 16);
-        RAM(i + 3) <= word(31 downto 24);
-        report integer'image(i) & " write:" & to_bstring(word);
-        i := i + 4;
+        HREAD(line_v, word, good);
+        report "word :" & to_hstring(word);
+        addr  := word(addr_width + data_width - 1 downto data_width);
+        instr := word(data_width - 1 downto 0);
+        i     := conv_integer(addr);
+        RAM(i)     <= instr(7 downto 0);
+        RAM(i + 1) <= instr(15 downto 8);
+        RAM(i + 2) <= instr(23 downto 16);
+        RAM(i + 3) <= instr(31 downto 24);
       end loop;
     end if;
   end process loadInstr;
   reader : process (all)
   begin
-    if rising_edge(clk) and clk = '1' then
-      if (raddr = 0) then
+    if rising_edge(clk) then
+      if (rst = '1') then
         rdata <= 32b"0";
       else
         rdata(7 downto 0)   <= RAM(conv_integer(raddr0));
@@ -148,6 +152,5 @@ begin
         rdata(31 downto 24) <= RAM(conv_integer(raddr3));
       end if;
     end if;
-    report "read: " & to_bstring(rdata);
   end process;
 end instrMem_rtl;

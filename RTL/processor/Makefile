@@ -1,4 +1,4 @@
-MODULE_NAME :=  simMem
+MODULE_NAME :=  singleCycle
 
 VFLAG := +acc -2008
 SFLAG := 
@@ -26,7 +26,9 @@ OBJ 	  = $(patsubst %.vhd, %.o, $(MODULE))
 SIMMODULE = $(addprefix $(MODULE_NAME), $(patsubst %.vhd, %,  $(notdir $(MODULE))))
 
 ### TODO
-INCLUDE_LIB 	+= 
+INCLUDE_LIB 	+= -c flipflop $(LIB_PATH)/flipflop_lib \
+				   -c simMem $(LIB_PATH)/simMem_lib \
+				   -c regMem $(LIB_PATH)/regMem_lib
 
 SIM_LIB         += $(INCLUDE_LIB) $(LIB_PATH)/$(MODULE_NAME)_lib
 ###
@@ -60,9 +62,12 @@ clean:
 
 
 compile:
+	$(VMAP) flipflop $(LIB_PATH)/flipflop_lib
+	$(VMAP)	simMem $(LIB_PATH)/simMem_lib
+	$(VMAP) regMem $(LIB_PATH)/regMem_lib
+	$(VMAP) ALU $(LIB_PATH)/ALU_lib
+	
 	$(VCC) $(VFLAG) $(MODULE) $(TOOL) -work work
-	$(VCC) $(VFLAG) $(MODULE) $(TOOL) -work $(LIB_PATH)/$(MODULE_NAME)_lib
-	$(VMAP) $(MODULE_NAME) $(LIB_PATH)/$(MODULE_NAME)_lib
+	$(VLIB) $(LIB_PATH)/$(MODULE_NAME)_lib
+	$(VMAP) $(LIB_PATH)/$(MODULE_NAME)_lib work
 	$(VCC) $(VFLAG) $(TEST) $(TOOL) -nocreatelib
-
- 

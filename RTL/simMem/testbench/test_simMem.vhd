@@ -1,10 +1,11 @@
 library ieee;
+library simMem;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 use std.textio.all;
-use work.tb_pkg.all;
-use work.simMem_pkg.all;
+use simMem.tb_pkg.all;
+use simMem.simMem_pkg.all;
 
 entity simMem_tb is
     generic (n : integer := 4);
