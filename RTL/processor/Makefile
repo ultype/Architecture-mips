@@ -66,7 +66,8 @@ compile:
 	$(VMAP)	simMem $(LIB_PATH)/simMem_lib
 	$(VMAP) regMem $(LIB_PATH)/regMem_lib
 	$(VMAP) ALU $(LIB_PATH)/ALU_lib
-	
+	$(VMAP) MipsEncode $(LIB_PATH)/MipsEncode_lib
+
 	$(VCC) $(VFLAG) $(MODULE) $(TOOL) -work work
 	$(VLIB) $(LIB_PATH)/$(MODULE_NAME)_lib
 	$(VMAP) $(LIB_PATH)/$(MODULE_NAME)_lib work

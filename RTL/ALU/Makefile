@@ -60,6 +60,8 @@ clean:
 
 
 compile:
+	$(VMAP) MipsEncode $(LIB_PATH)/MipsEncode_lib
 	$(VCC) $(VFLAG) $(MODULE) $(TOOL) -work work
 	$(VCC) $(VFLAG) $(MODULE) $(TOOL) -work $(LIB_PATH)/$(MODULE_NAME)_lib
+	$(VMAP) $(MODULE_NAME) $(LIB_PATH)/$(MODULE_NAME)_lib
 	$(VCC) $(VFLAG) $(TEST) $(TOOL) -nocreatelib
