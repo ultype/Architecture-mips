@@ -1,7 +1,7 @@
 MODULE_NAME :=  ALU
 
 VFLAG := +acc -2008
-SFLAG := 
+SFLAG :=
 
 
 MODULE_PATH     := ./module
