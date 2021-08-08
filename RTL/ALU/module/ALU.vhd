@@ -114,7 +114,7 @@ architecture ALU32_impl of ALU32 is
   signal invA, invB : std_logic;
   signal carry      : std_logic;
   signal ALUsel     : std_logic_vector(2 downto 0);
-  signal ALUsign    : std_logic;
+  signal            : std_logic;
 
   signal selShift   : std_logic_vector(1 downto 0);
   signal signShift  : std_logic;
@@ -135,7 +135,7 @@ begin
   invB      <= ctrl(10);
   carry     <= ctrl(9);
   ALUsel    <= ctrl(8 downto 6);
-  ALUSign   <= ctrl(5);
+  ALUunsign <= ctrl(5);
   selShift  <= ctrl(4 downto 3);
   signShift <= ctrl(2);
   dirShift  <= ctrl(1);
@@ -185,7 +185,7 @@ begin
 
   OVF_SEL : process (all)
   begin
-    if (ALUsign) then
+    if (ALUunsig) then
       ovf <= uovf;
     else
       ovf <= sovf;
@@ -195,7 +195,7 @@ begin
   L(31 downto 1) <= 31b"0";
   L_SEL : process (all)
   begin
-    if (ALUSign) then
+    if (ALUunsig) then
       L(0) <= C(32); --unsigned
     else
       L(0) <= S(31); --signed
@@ -204,7 +204,7 @@ begin
 
   LESS_SEL : process (all)
   begin
-    if (ALUSign) then
+    if (ALUunsig) then
       less <= uless;--unsign;
     else
       less <= sless;
