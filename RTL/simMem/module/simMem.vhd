@@ -23,7 +23,8 @@ package simMem_pkg is
 
   component instrMem is
     port (
-      clk   : in std_logic;
+      clk1  : in std_logic;
+      clk2  : in std_logic;
       rst   : in std_logic;
       raddr : in std_logic_vector(addr_width - 1 downto 0);
       rdata : out std_logic_vector(data_width - 1 downto 0));
@@ -66,7 +67,7 @@ begin
   waddr3 <= waddr(addr_width - 1 downto 2) & 2b"11";
   writer : process (all)
   begin
-    if rising_edge(clk1) then
+    if (falling_edge(clk1) and clk2 = '1') then
       if wen = '1' then
         RAM(conv_integer(waddr0)) <= wdata(7 downto 0);
         RAM(conv_integer(waddr1)) <= wdata(15 downto 8);
@@ -79,7 +80,7 @@ begin
 
   reader : process (all)
   begin
-    if rising_edge(clk2) then
+    if (falling_edge(clk2) and clk1 = '0') then
       rdata(7 downto 0)   <= RAM(conv_integer(raddr0));
       rdata(15 downto 8)  <= RAM(conv_integer(raddr1));
       rdata(23 downto 16) <= RAM(conv_integer(raddr2));
@@ -97,9 +98,10 @@ use work.simMem_pkg.all;
 
 entity instrMem is
   port (
-    clk   : in std_logic;
+    clk1  : in std_logic;
+    clk2  : in std_logic;
     rst   : in std_logic;
-    raddr : in std_logic_vector(addr_width - 1 downto 0) := 32b"0";
+    raddr : in std_logic_vector(addr_width - 1 downto 0);
     rdata : out std_logic_vector(data_width - 1 downto 0));
 end instrMem;
 
@@ -140,9 +142,10 @@ begin
       end loop;
     end if;
   end process loadInstr;
+
   reader : process (all)
   begin
-    if rising_edge(clk) then
+    if (rising_edge(clk2) and (clk1 = '1')) then
       if (rst = '1') then
         rdata <= 32b"0";
       else
@@ -153,4 +156,5 @@ begin
       end if;
     end if;
   end process;
+
 end instrMem_rtl;

@@ -107,6 +107,7 @@ architecture ALU32_impl of ALU32 is
   signal L          : std_logic_vector(32 downto 0);
   signal S          : std_logic_vector(32 downto 0);
   signal shift      : std_logic_vector(4 downto 0);
+  signal ALUunsign  : std_logic;
 
   signal selA       : std_logic;
   signal selB       : std_logic_vector(1 downto 0);
@@ -114,7 +115,6 @@ architecture ALU32_impl of ALU32 is
   signal invA, invB : std_logic;
   signal carry      : std_logic;
   signal ALUsel     : std_logic_vector(2 downto 0);
-  signal            : std_logic;
 
   signal selShift   : std_logic_vector(1 downto 0);
   signal signShift  : std_logic;
@@ -185,8 +185,8 @@ begin
 
   OVF_SEL : process (all)
   begin
-    if (ALUunsig) then
-      ovf <= uovf;
+    if (ALUunsign) then
+      ovf <= '0';
     else
       ovf <= sovf;
     end if;
@@ -195,7 +195,7 @@ begin
   L(31 downto 1) <= 31b"0";
   L_SEL : process (all)
   begin
-    if (ALUunsig) then
+    if (ALUunsign) then
       L(0) <= C(32); --unsigned
     else
       L(0) <= S(31); --signed
@@ -204,7 +204,7 @@ begin
 
   LESS_SEL : process (all)
   begin
-    if (ALUunsig) then
+    if (ALUunsign) then
       less <= uless;--unsign;
     else
       less <= sless;
@@ -524,7 +524,5 @@ end entity;
 architecture signExtend16to32_impl of signExtend16to32 is
   signal s : std_logic;
 begin
-  s  <= signExt and di(15);
-  do <= (15 downto 0 => di, others => s);
-
+  do <= (15 downto 0 => di, others => di(15));
 end signExtend16to32_impl;
